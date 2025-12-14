@@ -1,26 +1,23 @@
 # utils/api_keys.py
 import os
+from dotenv import load_dotenv
 
-# try streamlit secrets first (when deployed in Streamlit Cloud)
-SECRETS = None
-try:
-    import streamlit as _st
-    SECRETS = _st.secrets
-except Exception:
-    SECRETS = None
+# load local .env if present (local dev). Streamlit Cloud will use st.secrets.
+_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+env_path = os.path.join(_root, ".env")
+load_dotenv(dotenv_path=env_path)
 
-def get_secret(key, default=None):
+def _get(key, default=None):
     v = os.getenv(key)
     if v:
         return v
-    if SECRETS and key in SECRETS:
-        return SECRETS[key]
+    # if running under Streamlit cloud, user can set st.secrets - the main app reads those
     return default
 
-BUS_API_KEY = get_secret("BUS_API_KEY")
-WEATHER_API_KEY = get_secret("WEATHER_API_KEY")
-SUBWAY_API_KEY = get_secret("SUBWAY_API_KEY")
-TRAFFIC_API_KEY = get_secret("TRAFFIC_API_KEY")
-CROSSROAD_API_KEY = get_secret("CROSSROAD_API_KEY")
-TRAFFIC_LIGHT_API_KEY = get_secret("TRAFFIC_LIGHT_API_KEY")
-NOMINATIM_USER_AGENT = get_secret("NOMINATIM_USER_AGENT", "smart-commute-agent")
+BUS_API_KEY = _get("BUS_API_KEY")
+WEATHER_API_KEY = _get("WEATHER_API_KEY")
+SUBWAY_API_KEY = _get("SUBWAY_API_KEY")
+TRAFFIC_API_KEY = _get("TRAFFIC_API_KEY")
+CROSSROAD_API_KEY = _get("CROSSROAD_API_KEY")
+TRAFFIC_LIGHT_API_KEY = _get("TRAFFIC_LIGHT_API_KEY")
+NOMINATIM_USER_AGENT = _get("NOMINATIM_USER_AGENT", "smart-commute-agent")
