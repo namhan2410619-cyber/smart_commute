@@ -2,24 +2,20 @@
 from datetime import datetime, timedelta
 
 class ScheduleAgent:
-    def __init__(self, target_time_str="08:40", prep_minutes=30):
+    def __init__(self, target_time_str="08:40", prep_minutes=30, safety_margin=5):
         self.target_time_str = target_time_str
         self.prep_minutes = int(prep_minutes)
+        self.safety_margin = int(safety_margin)
 
-    def decide_wakeup(self, travel_minutes, wait_eta=None, weather_penalty=0):
-        wait = 0
-        if wait_eta and wait_eta>0:
-            wait = int(wait_eta)
-        total = travel_minutes + wait + weather_penalty + self.prep_minutes
+    def compute_wakeup_dt(self, travel_minutes, wait_eta=0, weather_penalty=0, extra_margin=0):
+        total = int(travel_minutes) + int(wait_eta) + int(weather_penalty) + int(self.prep_minutes) + int(self.safety_margin) + int(extra_margin)
         today = datetime.now().date()
         sh, sm = map(int, self.target_time_str.split(":"))
         school_dt = datetime.combine(today, datetime.min.time()).replace(hour=sh, minute=sm)
         wake_dt = school_dt - timedelta(minutes=total)
         return wake_dt
 
-    def dynamic_update_interval(self, wake_dt):
-        # 남은 시간에 따라 갱신 주기(초)
-        from datetime import datetime
+    def dynamic_update_interval_seconds(self, wake_dt):
         now = datetime.now()
         remaining = (wake_dt - now).total_seconds()
         if remaining <= 0:
