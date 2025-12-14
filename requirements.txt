@@ -5,3 +5,4 @@ requests
 python-dotenv
 xmltodict
 pytz
+scikit-learn
